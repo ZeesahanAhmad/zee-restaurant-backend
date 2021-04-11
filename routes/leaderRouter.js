@@ -1,48 +1,77 @@
 const express=require('express');
 const bodyParser=require('body-parser');
+const Leaders=require('../models/leaders')
 const leaderRouter=express.Router();
 leaderRouter.use(bodyParser.json());
 
 leaderRouter.route('/')
-.all((req, res, next)=>{
-    res.statusCode=200;
-    res.setHeader('Content-Type','text/plain');
-    next();
-})
 .get((req, res,next)=>{
-    res.end('here is the details of all the leaders!');
+    Leaders.find({})
+    .then(leaders=>{
+        res.statusCode=200;
+        res.setHeader('Content-Type', 'application/json')
+        res.json(leaders);
+    }, err=>next(err))
+    .catch(err=>next(err));
 
 })
 .post((req, res, next)=>{
-    res.end('adding all the details of leader: '+req.body.name+' and'+req.body.description);
+    Leaders.create(req.body)
+    .then(leaders=>{
+        res.statusCode=200;
+        res.setHeader('Content-Type', 'application/json')
+        res.json(leaders);
+    }, err=>next(err))
+    .catch(err=>next(err))
 })
 .put((req, res,next)=>{
     res.statusCode=403;
     res.end('put operation not supported on /leaders');
 })
 .delete((req, res, next)=>{
-    res.end('deleting all leaders...');
+    Leaders.deleteMany()
+    .then(resp=>{
+        res.statusCode=200;
+        res.setHeader('Content-Type', 'application/json')
+        res.json(resp);
+    },err=>next(err))
+    .catch(err=>next(err));
 });
 
 leaderRouter.route('/:leaderId')
-.all((req, res, next)=>{
-    res.statusCode=200;
-    res.setHeader('Content-Type','text/plain');
-    next();
-})
+
 .get((req, res,next)=>{
-    res.end('here is the details of leader id: '+req.params.leaderId);
+    Leaders.findById(req.params.leaderId)
+    .then(leader=>{
+     res.statusCode=200;
+     res.setHeader('Content-Type', 'application/json');
+     res.json(leader);
+ 
+    },err=>next(err))
+    .catch(err=>next(err));
 
 })
 .post((req, res, next)=>{
     res.statusCode=403;
-    res.end('post operation not supported on /leaders/'+req.params.leaderId);
+    res.end('post operation not supported on /promotions/'+req.params.leaderId);
 })
 .put((req, res,next)=>{
-    res.end('updating dish with leaderId: '+req.params.leaderId);
+    Leaders.findByIdAndUpdate(req.params.leaderId,{$set:req.body},{new:true})
+    .then(leader=>{
+        res.statusCode=200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(leader);
+    },err=>next(err))
+    .catch(err=>next(err));
 })
 .delete((req, res, next)=>{
-    res.end('deleting leadersId='+req.params.leaderId+"...");
+    Leaders.findByIdAndRemove(req.params.leaderId)
+    .then(resp=>{
+        res.statusCode=200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(resp);
+    })
+    .catch(err=>next(err));
 });
 
 module.exports=leaderRouter;

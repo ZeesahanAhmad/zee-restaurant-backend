@@ -3,7 +3,7 @@ const bodyParser=require('body-parser');
 const dishRouter=express.Router();
 dishRouter.use(bodyParser.json());
 const Dishes=require('../models/dishes');
-const { response } = require('express');
+
 
 // routes for dishes
 dishRouter.route('/')
@@ -23,7 +23,7 @@ dishRouter.route('/')
    .then(dish=>{
        console.log('dish created successfully: '+dish);
        res.statusCode=200;
-       res.setHeader('Content-Type', 'application/json')
+        
        res.json(dish);
 
    },err=> next(err))
